@@ -26,34 +26,34 @@
 			return Array.prototype.slice.call( obj );
 		},
 
-		Hata = function( sel, context ) {
+		Hata = function( selector, context ) {
 			if ( !( this instanceof Hata ) ) {
-				return new Hata( sel, context );
+				return new Hata( selector, context );
 			}
 
 			// Handle with context
 			if ( context !== undefined ) {
-				return new Hata( context || document ).find( sel );
+				return new Hata( context || document ).find( selector );
 			}
 
 			// HANDLE: hata(''), hata(null), hata(undefined), hata(false)
-			if ( !sel ) {
+			if ( !selector ) {
 				this.elems = [document];
 				return this;
 			}
 
 			var elems =
 				// Handle HTML string
-				sel === 'body' ? [document.body] :
-				typeof sel === 'string' ? Hata._query( document, sel ) :
+				selector === 'body' ? [document.body] :
+				typeof selector === 'string' ? Hata._query( document, selector ) :
 
 				// HANDLE: hata(DOMElement)
-				sel === window || sel.nodeType ? [sel] :
+				selector === window || selector.nodeType ? [selector] :
 
-				// HANDLE: hata(hata(sel));
-				sel instanceof Hata ? makeArray( sel.elems ) :
+				// HANDLE: hata(hata(selector));
+				selector instanceof Hata ? makeArray( selector.elems ) :
 
-				makeArray( sel );
+				makeArray( selector );
 
 			if ( elems.length === 1 && elems[0] == null ) {
 				elems.length = 0;
@@ -64,29 +64,29 @@
 			return this;
 		};
 
-	Hata._query = function( context, sel ) {
-		if ( regExp.Id.test( sel ) ) {
-			return [context.getElementById(sel.substr(1))];
+	Hata._query = function( context, selector ) {
+		if ( regExp.Id.test( selector ) ) {
+			return [context.getElementById(selector.substr(1))];
 		}
 
-		if ( regExp.Class.test( sel ) ) {
-			return makeArray( context.getElementsByClassName(sel.substr(1)) );
+		if ( regExp.Class.test( selector ) ) {
+			return makeArray( context.getElementsByClassName(selector.substr(1)) );
 		}
 
-		if ( regExp.Tag.test( sel ) ) {
-			return makeArray( context.getElementsByTagName(sel) );
+		if ( regExp.Tag.test( selector ) ) {
+			return makeArray( context.getElementsByTagName(selector) );
 		}
 
-		return makeArray( context.querySelectorAll(sel) );
+		return makeArray( context.querySelectorAll(selector) );
 	};
 
-	Hata._find = function( context, sel ) {
-		if ( !sel ) {
+	Hata._find = function( context, selector ) {
+		if ( !selector ) {
 			return context == null ? [] : [context];
 		}
 
-		var result = sel.nodeName ? [sel]
-			: typeof sel === 'string' ? Hata._query( context, sel ) : [context];
+		var result = selector.nodeName ? [selector]
+			: typeof selector === 'string' ? Hata._query( context, selector ) : [context];
 		return (result.length === 1 && result[0] == null) ? [] : result;
 	};
 
@@ -121,20 +121,20 @@
 			return new Hata( this.get(index) );
 		},
 
-		is: function( sel ) {
-			return this.filter( sel ).get().length > 0;
+		is: function( selector ) {
+			return this.filter( selector ).get().length > 0;
 		},
 
 		each: function( iterator ) {
 			return this.elems.forEach( iterator.bind(this) );
 		},
 
-		find: function( sel ) {
+		find: function( selector ) {
 			var result = [];
 
 			this.each(function( elem ) {
 				var i = 0,
-					found = Hata._find( elem, sel ),
+					found = Hata._find( elem, selector ),
 					l = found.length;
 
 				while (i < l) {
@@ -145,10 +145,10 @@
 			return new Hata( result );
 		},
 
-		closest: function( sel ) {
+		closest: function( selector ) {
 			var parent,
 				parents = [],
-				elements = new Hata ( sel ).get();
+				elements = new Hata ( selector ).get();
 
 			this.each(function( elem ) {
 				parent = elem;
@@ -163,8 +163,8 @@
 			return new Hata ( parents );
 		},
 
-		filter: function( sel ) {
-			var elements = new Hata( sel ),
+		filter: function( selector ) {
+			var elements = new Hata( selector ),
 				result = [];
 
 			this.each(function( parent ) {
