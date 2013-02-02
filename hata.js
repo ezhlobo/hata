@@ -121,6 +121,10 @@
 			return new Hata( this.get(index) );
 		},
 
+		is: function( sel ) {
+			return this.filter( sel ).get().length > 0;
+		},
+
 		each: function( iterator ) {
 			return this.elems.forEach( iterator.bind(this) );
 		},

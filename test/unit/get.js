@@ -120,4 +120,26 @@ new function () {
 			'hata(sel, "#id").filter(attribute) is right')
 	});
 
+	test('hata().is', function() {
+		expect(4);
+
+		var hataObj;
+
+		hataObj = hata($ID).is(wrapper);
+		strictEqual(hataObj, true,
+			'hata("#id").is(document.getElementById("id")) is right')
+
+		hataObj = hata($ID).is($ID);
+		strictEqual(hataObj, true,
+			'hata("#id").is("id") is right')
+
+		hataObj = hata($ID).is(doc);
+		strictEqual(hataObj, false,
+			'hata("#id").is(document) returned false')
+
+		hataObj = hata('a').is('[title=test]');
+		strictEqual(hataObj, true,
+			'One of hata elements matches with is(value), not all elements')
+	});
+
 };
