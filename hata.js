@@ -148,7 +148,7 @@
 		closest: function( selector ) {
 			var parent,
 				parents = [],
-				elements = new Hata ( selector ).get();
+				elements = new Hata( selector ).get();
 
 			this.each(function( elem ) {
 				parent = elem;
@@ -160,7 +160,7 @@
 				includeUnique( parents, parent );
 			});
 
-			return new Hata ( parents );
+			return new Hata( parents );
 		},
 
 		filter: function( selector ) {
