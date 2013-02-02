@@ -18,6 +18,7 @@
 			if ( !( array.indexOf( element ) >= 0 ) ) {
 				array[array.length] = element;
 			}
+
 			return array;
 		},
 
@@ -156,6 +157,19 @@
 			});
 
 			return new Hata ( parents );
+		},
+
+		filter: function( sel ) {
+			var elements = new Hata( sel ),
+				result = [];
+
+			this.each(function( parent ) {
+				if ( elements.get().indexOf( parent ) >= 0 ) {
+					includeUnique( result, parent );
+				}
+			});
+
+			return new Hata( result );
 		}
 	});
 

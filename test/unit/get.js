@@ -106,4 +106,18 @@ new function () {
 			'hata(sel, "#id").closest(sel) returned self')
 	});
 
+	test('hata().filter', function() {
+		expect(2);
+
+		var hataObj;
+
+		hataObj = hata('a', $ID).filter('.foo');
+		deepEqual(hataObj.get(), makeArray(wrapper.getElementsByClassName('foo')),
+			'hata(sel, "#id").filter(class) is right')
+
+		hataObj = hata('a', $ID).filter('[title=test]');
+		deepEqual(hataObj.get(), makeArray(wrapper.querySelectorAll('a[title=test]')),
+			'hata(sel, "#id").filter(attribute) is right')
+	});
+
 };
