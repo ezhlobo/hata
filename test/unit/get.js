@@ -14,13 +14,15 @@ new function () {
 	module('Get');
 
 	test('Standart selectors', function() {
-		expect(16);
+		expect(19);
 
 		deepEqual(hata(window).get(), [win],
 			'hata(window) is window');
 
 		deepEqual(hata().get(), [doc],
 			'hata() is document');
+		deepEqual(hata(doc).get(), [doc],
+			'hata(document) is document');
 
 		deepEqual(hata('body').get(), [doc.body],
 			'hata("body") is body');
@@ -30,6 +32,11 @@ new function () {
 
 		deepEqual(hata(doc.getElementsByTagName('p')).get(), makeArray(doc.getElementsByTagName('p')),
 			'hata( document.getElementsByTagName("p") ) is right');
+
+		deepEqual(hata(doc.querySelector('p')).get(), [doc.querySelector('p')],
+			'hata( document.querySelector("p") ) is right');
+		deepEqual(hata(doc.querySelectorAll('p')).get(), makeArray(doc.querySelectorAll('p')),
+			'hata( document.querySelectorAll("p") ) is right');
 
 		deepEqual(hata('p').get(), makeArray(doc.getElementsByTagName('p')),
 			'hata("p") is right');
