@@ -8,8 +8,8 @@ new function () {
 		slice = [].slice,
 
 		makeArray = function(obj) {
-      return Array.prototype.slice.call(obj);
-    };
+			return Array.prototype.slice.call(obj);
+		};
 
 	module('Get');
 
@@ -90,6 +90,20 @@ new function () {
 		deepEqual(hata($ID, doc).find('p').get(), makeArray(wrapper.getElementsByTagName('p')),
 			'hata("#id", document).find("p") is right');
 
+	});
+
+	test('hata().closest', function() {
+		expect(2);
+
+		var hataObj;
+
+		hataObj = hata('h1', $ID).closest($ID);
+		deepEqual(hataObj.get(), [wrapper],
+			'hata(sel, "#id").closest("#id") returned parent')
+
+		hataObj = hata('h1', $ID).closest('h1');
+		deepEqual(hataObj.get(), makeArray(wrapper.getElementsByTagName('h1')),
+			'hata(sel, "#id").closest(sel) returned self')
 	});
 
 };

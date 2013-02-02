@@ -15,7 +15,7 @@
 		},
 
 		includeUnique = function( array, element ) {
-			if ( !( array.indexOf(element) >= 0 ) ) {
+			if ( !( array.indexOf( element ) >= 0 ) ) {
 				array[array.length] = element;
 			}
 			return array;
@@ -138,6 +138,24 @@
 			});
 
 			return new Hata( result );
+		},
+
+		closest: function( sel ) {
+			var parent,
+				parents = [],
+				elements = new Hata ( sel ).get();
+
+			this.each(function( elem ) {
+				parent = elem;
+
+				while ( parent !== document && elements.indexOf( parent ) < 0 ) {
+					parent = parent.parentNode;
+				}
+
+				includeUnique( parents, parent );
+			});
+
+			return new Hata ( parents );
 		}
 	});
 
