@@ -1,10 +1,10 @@
 (function( window, document, undefined ) {
 
 	var
-		// Save the previous value of the Hata variable.
+		// Save the previous value of the Hata variable
 		_Hata = Hata,
 
-		// Establish the object that gets returned to break out of a loop iteration.
+		// Establish the object that gets returned to break out of a loop iteration
 		breaker = {},
 
 		// State of document ready
@@ -18,7 +18,7 @@
 			if ( !isDomReady ) {
 				isDomReady = true;
 
-				for ( var i = 0; i < onDomReady.length; i++ ) {
+				for ( var i = 0, l = onDomReady.length; i < l; i++ ) {
 					onDomReady[ i ]();
 				}
 
@@ -28,14 +28,14 @@
 
 		// Types of standard selectors
 		regExp = {
-			Tag  : /^[-_a-z0-9]+$/i,
+			Tag: /^[-_a-z0-9]+$/i,
 			Class: /^\.[-_a-z0-9]+$/i,
-			Id   : /^#[-_a-z0-9]+$/i
+			Id: /^#[-_a-z0-9]+$/i
 		},
 
 		includeUnique = function( array, element ) {
 			if ( !( array.indexOf( element ) >= 0 ) ) {
-				array[array.length] = element;
+				array.push( element );
 			}
 
 			return array;
@@ -46,7 +46,7 @@
 		},
 
 		Hata = function( selector, context ) {
-			if ( !( this instanceof Hata ) ) {
+			if ( !(this instanceof Hata) ) {
 				return new Hata( selector, context );
 			}
 
@@ -57,17 +57,17 @@
 
 			// HANDLE: hata(''), hata(null), hata(undefined), hata(false)
 			if ( !selector ) {
-				this.elems = [document];
+				this.elems = [ document ];
 				return this;
 			}
 
 			var elems =
 				// Handle HTML string
-				selector === 'body' ? [document.body] :
+				selector === 'body' ? [ document.body ] :
 				typeof selector === 'string' ? Hata._query( document, selector ) :
 
 				// HANDLE: hata(DOMElement)
-				selector === window || selector.nodeType ? [selector] :
+				selector === window || selector.nodeType ? [ selector ] :
 
 				// HANDLE: hata(hata(selector));
 				selector instanceof Hata ? makeArray( selector.elems ) :
@@ -86,42 +86,6 @@
 	document.addEventListener('DOMContentLoaded', readyCallback, false);
 	window.addEventListener('load', readyCallback, false);
 
-	Hata.ready = function( fn ) {
-		if ( isDomReady ) {
-			fn();
-		} else {
-			onDomReady.push( fn );
-		}
-
-		return this;
-	};
-
-	Hata._query = function( context, selector ) {
-		if ( regExp.Id.test( selector ) ) {
-			return [context.getElementById(selector.substr(1))];
-		}
-
-		if ( regExp.Class.test( selector ) ) {
-			return makeArray( context.getElementsByClassName(selector.substr(1)) );
-		}
-
-		if ( regExp.Tag.test( selector ) ) {
-			return makeArray( context.getElementsByTagName(selector) );
-		}
-
-		return makeArray( context.querySelectorAll(selector) );
-	};
-
-	Hata._find = function( context, selector ) {
-		if ( !selector ) {
-			return context == null ? [] : [context];
-		}
-
-		var result = selector.nodeName ? [selector]
-			: typeof selector === 'string' ? Hata._query( context, selector ) : [context];
-		return (result.length === 1 && result[0] == null) ? [] : result;
-	};
-
 	Hata.extend = function( target, source ) {
 		if ( !source ) {
 			source = target;
@@ -130,12 +94,58 @@
 
 		for ( var key in source ) {
 			if ( hasOwnProperty.call( source, key ) ) {
-				target[key] = source[key];
+				target[ key ] = source[ key ];
 			}
 		}
 
 		return target;
 	};
+
+	Hata.extend( Hata, {
+		ready: function( fn ) {
+			if ( isDomReady ) {
+				fn();
+			} else {
+				onDomReady.push( fn );
+			}
+
+			return this;
+		},
+
+		noConflict: function() {
+			if ( window.hata === Hata ) {
+				window.hata = _Hata;
+			}
+
+			return Hata;
+		},
+
+		_query: function( context, selector ) {
+			if ( regExp.Id.test( selector ) ) {
+				return [ context.getElementById(selector.substr(1)) ];
+			}
+
+			if ( regExp.Class.test( selector ) ) {
+				return makeArray( context.getElementsByClassName(selector.substr(1)) );
+			}
+
+			if ( regExp.Tag.test( selector ) ) {
+				return makeArray( context.getElementsByTagName(selector) );
+			}
+
+			return makeArray( context.querySelectorAll(selector) );
+		},
+
+		_find: function( context, selector ) {
+			if ( !selector ) {
+				return context == null ? [] : [ context ];
+			}
+
+			var result = selector.nodeName ? [ selector ]
+				: typeof selector === 'string' ? Hata._query( context, selector ) : [ context ];
+			return (result.length === 1 && result[0] == null) ? [] : result;
+		}
+	});
 
 	Hata.extend({
 		get: function( index ) {
@@ -143,7 +153,7 @@
 
 			if ( index !== undefined ) {
 				var n = index < 0 ? elems.length + index : index;
-				return elems[n];
+				return elems[ n ];
 			}
 
 			return elems;
@@ -171,7 +181,7 @@
 					l = found.length;
 
 				while (i < l) {
-					includeUnique( result, found[i++]);
+					includeUnique( result, found[ i++ ]);
 				}
 			});
 
@@ -211,13 +221,5 @@
 	});
 
 	window.hata = Hata;
-
-	Hata.noConflict = function() {
-		if ( window.hata === Hata ) {
-			window.hata = _Hata;
-		}
-
-		return Hata;
-	};
 
 }( window, window.document ));
