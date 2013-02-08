@@ -7,6 +7,25 @@
 		// Establish the object that gets returned to break out of a loop iteration.
 		breaker = {},
 
+		// State of document ready
+		isDomReady = false,
+
+		// Array of callbacks that are invoked when the document is ready
+		onDomReady = [],
+
+		// Invoked when the document is ready
+		readyCallback = function() {
+			if ( !isDomReady ) {
+				isDomReady = true;
+
+				for ( var i = 0; i < onDomReady.length; i++ ) {
+					onDomReady[ i ]();
+				}
+
+				onDomReady = [];
+			}
+		},
+
 		// Types of standard selectors
 		regExp = {
 			Tag  : /^[-_a-z0-9]+$/i,
@@ -63,6 +82,19 @@
 
 			return this;
 		};
+
+	document.addEventListener('DOMContentLoaded', readyCallback, false);
+	window.addEventListener('load', readyCallback, false);
+
+	Hata.ready = function( fn ) {
+		if ( isDomReady ) {
+			fn();
+		} else {
+			onDomReady.push( fn );
+		}
+
+		return this;
+	};
 
 	Hata._query = function( context, selector ) {
 		if ( regExp.Id.test( selector ) ) {
