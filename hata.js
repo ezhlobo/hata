@@ -126,7 +126,8 @@
 		},
 
 		each: function( iterator ) {
-			return this.elems.forEach( iterator.bind(this) );
+			this.get().forEach( iterator.bind(this) );
+			return this;
 		},
 
 		find: function( selector ) {
