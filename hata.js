@@ -55,7 +55,7 @@
 				return new Hata( context || document ).find( selector );
 			}
 
-			// HANDLE: hata(''), hata(null), hata(undefined), hata(false)
+			// HANDLE: hata(""), hata(null), hata(undefined), hata(false)
 			if ( !selector ) {
 				this.elems = [ document ];
 				return this;
@@ -63,8 +63,8 @@
 
 			var elems =
 				// Handle HTML string
-				selector === 'body' ? [ document.body ] :
-				typeof selector === 'string' ? Hata._query( document, selector ) :
+				selector === "body" ? [ document.body ] :
+				typeof selector === "string" ? Hata._query( document, selector ) :
 
 				// HANDLE: hata(DOMElement)
 				selector === window || selector.nodeType ? [ selector ] :
@@ -83,8 +83,8 @@
 			return this;
 		};
 
-	document.addEventListener('DOMContentLoaded', readyCallback, false);
-	window.addEventListener('load', readyCallback, false);
+	document.addEventListener("DOMContentLoaded", readyCallback, false);
+	window.addEventListener("load", readyCallback, false);
 
 	Hata.extend = function( target, source ) {
 		if ( !source ) {
@@ -142,7 +142,7 @@
 			}
 
 			var result = selector.nodeName ? [ selector ]
-				: typeof selector === 'string' ? Hata._query( context, selector ) : [ context ];
+				: typeof selector === "string" ? Hata._query( context, selector ) : [ context ];
 			return (result.length === 1 && result[0] == null) ? [] : result;
 		}
 	});
