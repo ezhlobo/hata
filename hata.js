@@ -200,7 +200,9 @@
 					parent = parent.parentNode;
 				}
 
-				includeUnique( parents, parent );
+				if ( parent !== document ) {
+					includeUnique( parents, parent );
+				}
 			});
 
 			return new Hata( parents );
