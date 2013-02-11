@@ -144,6 +144,14 @@
 			var result = selector.nodeName ? [ selector ]
 				: typeof selector === "string" ? Hata._query( context, selector ) : [ context ];
 			return (result.length === 1 && result[0] == null) ? [] : result;
+		},
+
+		_isFunction: function( obj ) {
+			if ( typeof (/./) !== "function" ) {
+				return typeof obj === "function";
+			} else {
+				return toString.call( obj ) == "[object " + name + "]";
+			}
 		}
 	});
 
