@@ -208,7 +208,7 @@
 					parent = parent.parentNode;
 				}
 
-				if ( parent !== document ) {
+				if ( parent !== document || selector === document ) {
 					includeUnique( parents, parent );
 				}
 			});
