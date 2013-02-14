@@ -142,4 +142,25 @@ new function () {
 			'One of hata elements matches with is(value), not all elements')
 	});
 
+	test('hata().parents', function() {
+		var hataObj,
+			element,
+			node;
+
+		element = hata('code');
+		node = doc.getElementById(ID);
+
+		hataObj = element.parents($ID).get()[0];
+		strictEqual(hataObj, node,
+			'hata(selector).parents(#id) is right');
+
+		hataObj = element.parents(node).get()[0];
+		strictEqual(hataObj, node,
+			'hata(selector).parents(DOMNode) is right');
+
+		hataObj = element.parents(doc).get()[0];
+		notEqual(hataObj, doc,
+			'hata(selector).parents(document) is empty');
+	});
+
 };

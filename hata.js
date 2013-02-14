@@ -216,6 +216,26 @@
 			return new Hata( parents );
 		},
 
+		parents: function( selector ) {
+			var parent,
+				parents = [],
+				elements = new Hata( selector ).get();
+
+			this.each(function( elem ) {
+				parent = elem.parentNode;
+
+				while ( parent !== document ) {
+					if ( elements.indexOf( parent ) > -1 ) {
+						includeUnique( parents, parent );
+					}
+
+					parent = parent.parentNode;
+				}
+			});
+
+			return new Hata( parents );
+		},
+
 		filter: function( selector ) {
 			var elements = new Hata( selector ),
 				result = [];
