@@ -40,11 +40,11 @@ new function () {
 		ok(hata($ID).is(wrapper) === true,
 			"hata(\"#id\").is(wrapper) return true");
 
-		ok(hata($ID).is(doc.querySelectorAll("div")) === false,
-			"hata(\"#id\").is(document.querySelectorAll(\"div\")) return false");
+		ok(hata($ID).is(doc.querySelectorAll("div")) === true,
+			"hata(\"#id\").is(document.querySelectorAll(\"div\")) return true");
 
-		ok(hata("div").is(wrapper) === false,
-			"hata(\"div\").is(wrapper) return false");
+		ok(hata("div").is(wrapper) === true,
+			"hata(\"div\").is(wrapper) return true");
 	});
 
 	test(".each()", function() {
