@@ -46,7 +46,7 @@
 		},
 
 		Hata = function( selector, context ) {
-			if ( !(this instanceof Hata) ) {
+			if ( !( this instanceof Hata)  ) {
 				return new Hata( selector, context );
 			}
 
@@ -57,20 +57,22 @@
 
 			// HANDLE: hata(""), hata(null), hata(undefined), hata(false)
 			if ( !selector ) {
-				this.elems = [ document ];
+				this.elems = [];
 				return this;
 			}
 
+			// HANDLE: hata(hata(selector))
+			if ( selector instanceof Hata ) {
+				return selector;
+			}
+
 			var elems =
-				// Handle HTML string
+				// Handle string
 				selector === "body" ? [ document.body ] :
 				typeof selector === "string" ? Hata._query( document, selector ) :
 
 				// HANDLE: hata(DOMElement)
 				selector === window || selector.nodeType ? [ selector ] :
-
-				// HANDLE: hata(hata(selector));
-				selector instanceof Hata ? makeArray( selector.elems ) :
 
 				makeArray( selector );
 
@@ -82,9 +84,6 @@
 
 			return this;
 		};
-
-	document.addEventListener("DOMContentLoaded", readyCallback, false);
-	window.addEventListener("load", readyCallback, false);
 
 	Hata.extend = function( target, source ) {
 		if ( !source ) {
@@ -100,6 +99,9 @@
 
 		return target;
 	};
+
+	document.addEventListener("DOMContentLoaded", readyCallback, false);
+	window.addEventListener("load", readyCallback, false);
 
 	Hata.extend( Hata, {
 		ready: function( fn ) {
@@ -143,15 +145,8 @@
 
 			var result = selector.nodeName ? [ selector ]
 				: typeof selector === "string" ? Hata._query( context, selector ) : [ context ];
-			return (result.length === 1 && result[0] == null) ? [] : result;
-		},
 
-		_isFunction: function( obj ) {
-			if ( typeof (/./) !== "function" ) {
-				return typeof obj === "function";
-			} else {
-				return toString.call( obj ) == "[object " + name + "]";
-			}
+			return (result.length === 1 && result[0] == null) ? [] : result;
 		}
 	});
 
@@ -176,7 +171,17 @@
 		},
 
 		each: function( iterator ) {
-			this.get().forEach( iterator.bind(this) );
+			var value,
+				elems = this.get();
+
+			for ( var i = 0; i < elems.length; i++ ) {
+				value = iterator.call( elems[ i ], elems[ i ], i );
+
+				if ( value === false ) {
+					break;
+				}
+			}
+
 			return this;
 		},
 
@@ -198,7 +203,7 @@
 
 		closest: function( selector ) {
 			var parent,
-				parents = [],
+				closest = [],
 				elements = new Hata( selector ).get();
 
 			this.each(function( elem ) {
@@ -209,11 +214,11 @@
 				}
 
 				if ( parent !== document || selector === document ) {
-					includeUnique( parents, parent );
+					includeUnique( closest, parent );
 				}
 			});
 
-			return new Hata( parents );
+			return new Hata( closest );
 		},
 
 		parents: function( selector ) {
