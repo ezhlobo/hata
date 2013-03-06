@@ -13,14 +13,30 @@
 		// Array of callbacks that are invoked when the document is ready
 		onDomReady = [],
 
+		each = function( obj, iterator ) {
+			if ( Array.isArray( obj ) ) {
+
+				for ( var i = 0, l = obj.length; i < l; i++ ) {
+					if ( iterator.call( obj[ i ], obj[ i ], i ) === false ) break;
+				}
+
+			} else {
+
+				for ( var key in obj ) {
+					if ( iterator.call( obj[ key ], obj[ key ], key ) === false ) break;
+				}
+
+			}
+		},
+
 		// Invoked when the document is ready
 		readyCallback = function() {
 			if ( !isDomReady ) {
 				isDomReady = true;
 
-				for ( var i = 0, l = onDomReady.length; i < l; i++ ) {
+				each( onDomReady, function(value, i) {
 					onDomReady[ i ]();
-				}
+				});
 
 				onDomReady = [];
 			}
@@ -91,11 +107,9 @@
 			target = Hata.prototype;
 		}
 
-		for ( var key in source ) {
-			if ( hasOwnProperty.call( source, key ) ) {
-				target[ key ] = source[ key ];
-			}
-		}
+		each( source, function( value, key ) {
+			target[ key ] = value;
+		});
 
 		return target;
 	};
@@ -121,6 +135,8 @@
 
 			return Hata;
 		},
+
+		each: each,
 
 		_query: function( context, selector ) {
 			if ( regExp.Id.test( selector ) ) {
@@ -171,17 +187,7 @@
 		},
 
 		each: function( iterator ) {
-			var value,
-				elems = this.get();
-
-			for ( var i = 0; i < elems.length; i++ ) {
-				value = iterator.call( elems[ i ], elems[ i ], i );
-
-				if ( value === false ) {
-					break;
-				}
-			}
-
+			each( this.get(), iterator );
 			return this;
 		},
 
