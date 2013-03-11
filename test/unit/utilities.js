@@ -3,9 +3,9 @@ new function () {
 	module("Utilities");
 
 	test("hata.extend", function() {
-		expect(3);
+		expect(5);
 
-		hata.extend({
+		hata.extend( hata.fn, {
 			get test() { return "test"; },
 			ping: function() { return "pong"; }
 		});
@@ -20,6 +20,23 @@ new function () {
 
 		ok(testObject.prop === "Yes",
 			"hata object extend");
+
+		var result, initial = {
+			// This will make "copyIsArray" true
+			array: [ 1, 2, 3, 4 ],
+			// If "copyIsArray" doesn't get reset to false, the check
+			// will evaluate true and enter the array copy block
+			// instead of the object copy block. Since the ternary in the
+			// "copyIsArray" block will will evaluate to false
+			// (check if operating on an array with ), this will be
+			// replaced by an empty array.
+			object: {}
+		};
+
+		result = hata.extend( {}, initial );
+
+		deepEqual( result, initial, "The [result] and [initial] have equal shape and values" );
+		ok( !Array.isArray( result.object ), "result.object wasn't paved with an empty array" );
 	});
 
 	test("hata.each", function() {

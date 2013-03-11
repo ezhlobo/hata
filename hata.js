@@ -101,17 +101,14 @@
 			return this;
 		};
 
-	Hata.extend = function( target, source ) {
-		if ( !source ) {
-			source = target;
-			target = Hata.prototype;
-		}
-
-		each( source, function( value, key ) {
-			target[ key ] = value;
+	Hata.extend = function( obj ) {
+		each( Array.prototype.slice.call( arguments, 1 ), function( source ) {
+			each( source, function( value, prop ) {
+				obj[ prop ] = value;
+			});
 		});
 
-		return target;
+		return obj;
 	};
 
 	document.addEventListener("DOMContentLoaded", readyCallback, false);
@@ -135,6 +132,8 @@
 
 			return Hata;
 		},
+
+		fn: Hata.prototype,
 
 		each: each,
 
@@ -166,7 +165,7 @@
 		}
 	});
 
-	Hata.extend({
+	Hata.extend( Hata.fn, {
 		get: function( index ) {
 			var elems = this.elems;
 

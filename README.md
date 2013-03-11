@@ -82,11 +82,17 @@ After this `hata` will be undefined and will accessed by `$$` until now.
 ## Extending
 If you want to extend hata methods:
 ```js
-hata.extend({
+hata.extend( hata.fn, {
   ping: function() {
     return 'pong';
   }
 });
+
+// or
+
+hata.fn.ping = function() {
+  return 'pong';
+}
 
 elements.ping(); // => 'pong'
 ```
