@@ -139,7 +139,7 @@
 
 		_query: function( context, selector ) {
 			if ( regExp.Id.test( selector ) ) {
-				return [ context.getElementById(selector.substr(1)) ];
+				return [ (context.getElementById ? context : document).getElementById(selector.substr(1)) ];
 			}
 
 			if ( regExp.Class.test( selector ) ) {
