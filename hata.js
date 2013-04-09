@@ -7,38 +7,20 @@
 		// Establish the object that gets returned to break out of a loop iteration
 		breaker = {},
 
-		// State of document ready
-		isDomReady = false,
-
-		// Array of callbacks that are invoked when the document is ready
-		onDomReady = [],
-
 		each = function( obj, iterator ) {
 			if ( Array.isArray( obj ) ) {
+				var i = 0,
+					l = obj.length;
 
-				for ( var i = 0, l = obj.length; i < l; i++ ) {
+				for ( ; i < l; i++ ) {
 					if ( iterator.call( obj[ i ], obj[ i ], i ) === false ) break;
 				}
-
 			} else {
+				var key;
 
-				for ( var key in obj ) {
+				for ( key in obj ) {
 					if ( iterator.call( obj[ key ], obj[ key ], key ) === false ) break;
 				}
-
-			}
-		},
-
-		// Invoked when the document is ready
-		readyCallback = function() {
-			if ( !isDomReady ) {
-				isDomReady = true;
-
-				each( onDomReady, function(value, i) {
-					onDomReady[ i ]();
-				});
-
-				onDomReady = [];
 			}
 		},
 
@@ -50,7 +32,7 @@
 		},
 
 		includeUnique = function( array, element ) {
-			if ( !( array.indexOf( element ) >= 0 ) ) {
+			if ( !( array.indexOf( element ) !== -1 ) ) {
 				array.push( element );
 			}
 
@@ -61,45 +43,68 @@
 			return Array.prototype.slice.call( obj );
 		},
 
-		Hata = function( selector, context ) {
-			if ( !( this instanceof Hata)  ) {
-				return new Hata( selector, context );
+		// State of document ready
+		isDomReady = false,
+
+		// Array of callbacks that are invoked when the document is ready
+		onDomReady = [],
+
+		// Invoked when the document is ready
+		readyCallback = function() {
+			if ( !isDomReady ) {
+				isDomReady = true;
+
+				each( onDomReady, function( value, i ) {
+					onDomReady[ i ]();
+				});
+
+				onDomReady = [];
 			}
+		};
 
-			// Handle with context
-			if ( context !== undefined ) {
-				return new Hata( context || document ).find( selector );
-			}
+	document.addEventListener( "DOMContentLoaded", readyCallback, false );
+	window.addEventListener( "load", readyCallback, false );
 
-			// HANDLE: hata(""), hata(null), hata(undefined), hata(false)
-			if ( !selector ) {
-				this.elems = [];
-				return this;
-			}
+	var Hata = function( selector, context ) {
+		if ( !( this instanceof Hata )  ) {
+			return new Hata( selector, context );
+		}
 
-			// HANDLE: hata(hata(selector))
-			if ( selector instanceof Hata ) {
-				return selector;
-			}
+		// Handle with context
+		if ( context !== undefined ) {
+			return new Hata( context || document ).find( selector );
+		}
 
-			var elems =
-				// Handle string
-				selector === "body" ? [ document.body ] :
-				typeof selector === "string" ? Hata._query( document, selector ) :
-
-				// HANDLE: hata(DOMElement)
-				selector === window || selector.nodeType ? [ selector ] :
-
-				makeArray( selector );
-
-			if ( elems.length === 1 && elems[0] == null ) {
-				elems.length = 0;
-			}
-
-			this.elems = elems;
+		// HANDLE: hata(""), hata(null), hata(undefined), hata(false)
+		if ( !selector ) {
+			this.elems = [];
 
 			return this;
-		};
+		}
+
+		// HANDLE: hata(hata(selector))
+		if ( selector instanceof Hata ) {
+			return selector;
+		}
+
+		var elems =
+			// HANDLE: hata(String)
+			selector === "body" ? [ document.body ] :
+			typeof selector === "string" ? Hata._query( document, selector ) :
+
+			// HANDLE: hata(DOMElement)
+			selector === window || selector.nodeType ? [ selector ] :
+
+			makeArray( selector );
+
+		if ( elems.length === 1 && elems[ 0 ] == null ) {
+			elems.length = 0;
+		}
+
+		this.elems = elems;
+
+		return this;
+	};
 
 	Hata.extend = function( obj ) {
 		each( Array.prototype.slice.call( arguments, 1 ), function( source ) {
@@ -110,9 +115,6 @@
 
 		return obj;
 	};
-
-	document.addEventListener("DOMContentLoaded", readyCallback, false);
-	window.addEventListener("load", readyCallback, false);
 
 	Hata.extend( Hata, {
 		ready: function( fn ) {
@@ -139,18 +141,18 @@
 
 		_query: function( context, selector ) {
 			if ( regExp.Id.test( selector ) ) {
-				return [ (context.getElementById ? context : document).getElementById(selector.substr(1)) ];
+				return [( context.getElementById ? context : document ).getElementById( selector.substr( 1 ) )];
 			}
 
 			if ( regExp.Class.test( selector ) ) {
-				return makeArray( context.getElementsByClassName(selector.substr(1)) );
+				return makeArray( context.getElementsByClassName( selector.substr( 1 ) ) );
 			}
 
 			if ( regExp.Tag.test( selector ) ) {
-				return makeArray( context.getElementsByTagName(selector) );
+				return makeArray( context.getElementsByTagName( selector ) );
 			}
 
-			return makeArray( context.querySelectorAll(selector) );
+			return makeArray( context.querySelectorAll( selector ) );
 		},
 
 		_find: function( context, selector ) {
@@ -158,27 +160,28 @@
 				return context == null ? [] : [ context ];
 			}
 
-			var result = selector.nodeName ? [ selector ]
-				: typeof selector === "string" ? Hata._query( context, selector ) : [ context ];
+			var result =
+				selector.nodeName ? [ selector ] :
+				typeof selector === "string" ? Hata._query( context, selector ) :
+				[ context ];
 
-			return (result.length === 1 && result[0] == null) ? [] : result;
+			return (result.length === 1 && result[ 0 ] == null) ? [] : result;
 		}
 	});
 
 	Hata.extend( Hata.fn, {
 		get: function( index ) {
-			var elems = this.elems;
+			var elements = this.elems;
 
 			if ( index !== undefined ) {
-				var n = index < 0 ? elems.length + index : index;
-				return elems[ n ];
+				return elements[ index < 0 ? elements.length + index : index ];
 			}
 
-			return elems;
+			return elements;
 		},
 
 		eq: function( index ) {
-			return new Hata( this.get(index) );
+			return new Hata( this.get( index ) );
 		},
 
 		is: function( selector ) {
@@ -187,18 +190,19 @@
 
 		each: function( iterator ) {
 			each( this.get(), iterator );
+
 			return this;
 		},
 
 		find: function( selector ) {
 			var result = [];
 
-			this.each(function( elem ) {
+			this.each(function( element ) {
 				var i = 0,
-					found = Hata._find( elem, selector ),
-					l = found.length;
+					l = found.length,
+					found = Hata._find( element, selector );
 
-				while (i < l) {
+				while ( i < l ) {
 					includeUnique( result, found[ i++ ]);
 				}
 			});
@@ -211,8 +215,8 @@
 				closest = [],
 				elements = new Hata( selector ).get();
 
-			this.each(function( elem ) {
-				parent = elem;
+			this.each(function( element ) {
+				parent = element;
 
 				while ( parent !== document && elements.indexOf( parent ) < 0 ) {
 					parent = parent.parentNode;
@@ -231,11 +235,11 @@
 				parents = [],
 				elements = new Hata( selector ).get();
 
-			this.each(function( elem ) {
-				parent = elem.parentNode;
+			this.each(function( element ) {
+				parent = element.parentNode;
 
 				while ( parent !== document ) {
-					if ( elements.indexOf( parent ) > -1 ) {
+					if ( elements.indexOf( parent ) !== -1 ) {
 						includeUnique( parents, parent );
 					}
 
@@ -250,9 +254,9 @@
 			var elements = new Hata( selector ),
 				result = [];
 
-			this.each(function( parent ) {
-				if ( elements.get().indexOf( parent ) >= 0 ) {
-					includeUnique( result, parent );
+			this.each(function( element ) {
+				if ( elements.get().indexOf( element ) !== -1 ) {
+					includeUnique( result, element );
 				}
 			});
 
