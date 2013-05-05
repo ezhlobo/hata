@@ -12,7 +12,6 @@ Lightweight JavaScript framework for manipulation dom elements.
   * [Filter elements](#filter-elements)
   * [Closest element](#closest-element)
 * [Invoking code after DOM is fully loaded](#invoking-code-after-dom-is-fully-loaded)
-* [Hata with other frameworks](#hata-with-other-frameworks)
 * [Extending](#extending)
 * [Applications use hata](#applications-use-hata)
 * [Contributions](#contributions)
@@ -47,7 +46,7 @@ elements.get( number ); // => One node by index
 ### Iterations:
 ```js
 elements.each(fucntion( element, index ) {
-  // this => elements
+  // this => node element
   // element => node element
   // index => index of node element
 });
@@ -72,12 +71,6 @@ hata.ready(function() {
   // Invoks when dom is ready
 });
 ```
-
-## Hata with other frameworks
-```js
-var $$ = hata.noConflict();
-```
-After this `hata` will be undefined and will accessed by `$$` until now.
 
 ## Extending
 If you want to extend hata methods:
@@ -114,8 +107,14 @@ someObject.ping(); // => 'pong'
 
 * [evgen.zhlobo.info](http://evgen.zhlobo.info/) - my personal blog with responsive layout. Look at [sources](https://github.com/EvgenyZhlobo/ezhlobo/blob/master/source/javascripts/main.js) for better understand role of Hata.
 
+* [vkleaner](http://vkleaner.losky.net) - chrome extension for vk.com that hides unwanted posts. Look at [sources](https://github.com/EvgenyZhlobo/vkleaner/tree/master/js) for better understand role of Hata.
+
 ## Contributions
 
-Contribuitions always are welcome. Hata is written according to [jQuery Core Style Guide](http://docs.jquery.com/JQuery_Core_Style_Guidelines). Feel free to fork and pull request changes.
-
-Thanks for all [contributors](https://github.com/EvgenyZhlobo/hata/graphs/contributors). You are really cool guys :).
+Contribuitions always are welcome. Hata is written according to [jQuery Core Style Guide](http://docs.jquery.com/JQuery_Core_Style_Guidelines) and:
+```js
+// Good
+if ( condition ) return some;
+if ( condition ) break;
+```
+Feel free to fork and pull request changes.

@@ -1,85 +1,88 @@
-(function( window, document, undefined ) {
+(function( window, undefined ) {
 
 	var
-		// Save the previous value of the Hata variable
-		_Hata = Hata,
+		// Use the correct document accordingly with window argument (sandbox)
+		document = window.document,
 
-		// Establish the object that gets returned to break out of a loop iteration
-		breaker = {},
+		// Is a given value an array?
+		isArray = Array.isArray,
 
-		each = function( obj, iterator ) {
-			if ( Array.isArray( obj ) ) {
-				var i = 0,
-					l = obj.length;
-
-				for ( ; i < l; i++ ) {
-					if ( iterator.call( obj[ i ], obj[ i ], i ) === false ) break;
-				}
-			} else {
-				var key;
-
-				for ( key in obj ) {
-					if ( iterator.call( obj[ key ], obj[ key ], key ) === false ) break;
-				}
-			}
-		},
-
-		// Types of standard selectors
-		regExp = {
-			Tag: /^[-_a-z0-9]+$/i,
-			Class: /^\.[-_a-z0-9]+$/i,
-			Id: /^#[-_a-z0-9]+$/i
-		},
-
-		includeUnique = function( array, element ) {
-			if ( !( array.indexOf( element ) !== -1 ) ) {
+		// Add an element to the array if it is unique
+		pushUnique = function( array, element ) {
+			if ( array.indexOf( element ) === -1 ) {
 				array.push( element );
 			}
 
 			return array;
 		},
 
-		makeArray = function( obj ) {
-			return Array.prototype.slice.call( obj );
+		// Convert something into an array
+		toArray = function( obj ) {
+			if ( !obj ) return [];
+			if ( /number|string/.test( typeof obj ) ) return [ obj ];
+			return [].slice.call( obj );
 		},
 
-		// State of document ready
 		isDomReady = false,
-
-		// Array of callbacks that are invoked when the document is ready
 		onDomReady = [],
+		domReadyCallback = function () {
+			if ( isDomReady ) return;
 
-		// Invoked when the document is ready
-		readyCallback = function() {
-			if ( !isDomReady ) {
-				isDomReady = true;
+			isDomReady = true;
 
-				each( onDomReady, function( value, i ) {
-					onDomReady[ i ]();
-				});
+			var i = 0,
+				l = onDomReady.length;
 
-				onDomReady = [];
+			for ( ; i < l; i++ ) {
+				onDomReady[ i ]();
 			}
-		};
 
-	document.addEventListener( "DOMContentLoaded", readyCallback, false );
-	window.addEventListener( "load", readyCallback, false );
+			onDomReady = [];
+		},
+
+		// Types of selectors
+		selectorType = {
+			Tag: /^[-_a-z0-9]+$/i,
+			Class: /^\.[-_a-z0-9]+$/i,
+			Id: /^#[-_a-z0-9]+$/i
+		},
+
+		// Return an array of nodes from the 'context' in
+		// accordance with the 'selector'
+		getElements_query = function( context, selector ) {
+			if ( selectorType.Id.test( selector ) && context.getElementById ) {
+				return [ context.getElementById( selector.substr( 1 ) ) ];
+			}
+
+			if ( selectorType.Class.test( selector ) ) {
+				return toArray( context.getElementsByClassName( selector.substr( 1 ) ) );
+			}
+
+			if ( selectorType.Tag.test( selector ) ) {
+				return toArray( context.getElementsByTagName( selector ) );
+			}
+
+			return toArray( context.querySelectorAll( selector ) );
+		},
+
+		// Return an array of found nodes from the 'context' in
+		// accordance with the 'selector'
+		getElements_find = function( context, selector ) {
+			if ( !selector ) {
+				return ( context == null ) ? [] : [ context ];
+			}
+
+			var result =
+				selector.nodeName ? [ selector ] :
+				typeof selector === "string" ? getElements_query( context, selector ) :
+				[ context ];
+
+			return ( result.length === 1 && result[ 0 ] == null ) ? [] : result;
+		};
 
 	var Hata = function( selector, context ) {
 		if ( !( this instanceof Hata )  ) {
 			return new Hata( selector, context );
-		}
-
-		// Handle with context
-		if ( context !== undefined ) {
-			return new Hata( context || document ).find( selector );
-		}
-
-		// HANDLE: hata(""), hata(null), hata(undefined), hata(false)
-		if ( !selector ) {
-			this.elems = [];
-
-			return this;
 		}
 
 		// HANDLE: hata(hata(selector))
@@ -87,28 +90,59 @@
 			return selector;
 		}
 
+		// HANDLE: hata(""), hata(null), hata(undefined), hata(false)
+		if ( !selector ) {
+			this.elems = [];
+			this.length = 0;
+
+			return this;
+		}
+
+		// HANDLE with context
+		if ( context !== undefined ) {
+			return new Hata( context || document ).find( selector );
+		}
+
 		var elems =
 			// HANDLE: hata(String)
 			selector === "body" ? [ document.body ] :
-			typeof selector === "string" ? Hata._query( document, selector ) :
+			typeof selector === "string" ? getElements_query( document, selector ) :
 
 			// HANDLE: hata(DOMElement)
 			selector === window || selector.nodeType ? [ selector ] :
 
-			makeArray( selector );
+			toArray( selector );
 
 		if ( elems.length === 1 && elems[ 0 ] == null ) {
 			elems.length = 0;
 		}
 
 		this.elems = elems;
+		this.length = this.elems.length;
 
 		return this;
 	};
 
+	// The cornerstone an each implementation
+	Hata.each = function( obj, iterator ) {
+		var i = 0,
+			l = obj.length;
+
+		if ( isArray( obj ) || obj.toString() == "[object NodeList]" ) {
+			for ( ; i < l; i++ ) {
+				if ( iterator.call( obj[ i ], obj[ i ], i ) === false ) break;
+			}
+		} else {
+			for ( i in obj ) {
+				if ( iterator.call( obj[ i ], obj[ i ], i ) === false ) break;
+			}
+		}
+	};
+
+	// Extend a given object with all the properties in passed-in object(s)
 	Hata.extend = function( obj ) {
-		each( Array.prototype.slice.call( arguments, 1 ), function( source ) {
-			each( source, function( value, prop ) {
+		Hata.each( [].slice.call( arguments, 1 ), function( source ) {
+			Hata.each( source, function( value, prop ) {
 				obj[ prop ] = value;
 			});
 		});
@@ -127,120 +161,89 @@
 			return this;
 		},
 
-		noConflict: function() {
-			if ( window.hata === Hata ) {
-				window.hata = _Hata;
-			}
+		pushUniq: pushUnique,
 
-			return Hata;
-		},
+		toArray: toArray,
 
-		fn: Hata.prototype,
-
-		each: each,
-
-		_query: function( context, selector ) {
-			if ( regExp.Id.test( selector ) ) {
-				return [( context.getElementById ? context : document ).getElementById( selector.substr( 1 ) )];
-			}
-
-			if ( regExp.Class.test( selector ) ) {
-				return makeArray( context.getElementsByClassName( selector.substr( 1 ) ) );
-			}
-
-			if ( regExp.Tag.test( selector ) ) {
-				return makeArray( context.getElementsByTagName( selector ) );
-			}
-
-			return makeArray( context.querySelectorAll( selector ) );
-		},
-
-		_find: function( context, selector ) {
-			if ( !selector ) {
-				return context == null ? [] : [ context ];
-			}
-
-			var result =
-				selector.nodeName ? [ selector ] :
-				typeof selector === "string" ? Hata._query( context, selector ) :
-				[ context ];
-
-			return (result.length === 1 && result[ 0 ] == null) ? [] : result;
-		}
+		// Copy of class prototype
+		fn: Hata.prototype
 	});
 
 	Hata.extend( Hata.fn, {
-		get: function( index ) {
-			var elements = this.elems;
+		// Return the Nth node in the hata object OR clean array
+		get: function( num ) {
+			var elems = this.elems;
 
-			if ( index !== undefined ) {
-				return elements[ index < 0 ? elements.length + index : index ];
-			}
-
-			return elements;
+			return num == null ? elems :
+				num < 0 ? elems[ this.length + num ] : elems[ num ];
 		},
 
-		eq: function( index ) {
-			return new Hata( this.get( index ) );
+		// Return the Nth element
+		eq: function( num ) {
+			return new Hata( this.get( num ) );
 		},
 
-		is: function( selector ) {
-			return this.filter( selector ).get().length > 0;
-		},
-
-		each: function( iterator ) {
-			each( this.get(), iterator );
-
-			return this;
-		},
-
+		// Return the element found in the context in accordance with the 'selector'
 		find: function( selector ) {
 			var result = [];
 
-			this.each(function( element ) {
+			this.each(function( elem ) {
 				var i = 0,
-					l = found.length,
-					found = Hata._find( element, selector );
+					found = getElements_find( elem, selector ),
+					l = found.length;
 
 				while ( i < l ) {
-					includeUnique( result, found[ i++ ]);
+					pushUnique( result, found[ i++ ]);
 				}
 			});
 
 			return new Hata( result );
 		},
 
+		// Return 'this' or closest parent which satisfies the 'selector'
 		closest: function( selector ) {
 			var parent,
 				closest = [],
-				elements = new Hata( selector ).get();
+				elems = new Hata( selector ).get();
 
-			this.each(function( element ) {
-				parent = element;
+			this.each(function( elem ) {
+				parent = elem;
 
-				while ( parent !== document && elements.indexOf( parent ) < 0 ) {
+				while ( parent !== document && elems.indexOf( parent ) === -1 ) {
 					parent = parent.parentNode;
 				}
 
-				if ( parent !== document || selector === document ) {
-					includeUnique( closest, parent );
+				if ( parent !== document ) {
+					pushUnique( closest, parent );
 				}
 			});
 
 			return new Hata( closest );
 		},
 
+		// Return parent
+		parent: function() {
+			var parents = [];
+
+			this.each(function( elem ) {
+				pushUnique( parents, elem.parentNode );
+			});
+
+			return new Hata( parents );
+		},
+
+		// Return parent which satisfies the 'selector'
 		parents: function( selector ) {
 			var parent,
 				parents = [],
-				elements = new Hata( selector ).get();
+				elems = new Hata( selector ).get();
 
-			this.each(function( element ) {
-				parent = element.parentNode;
+			this.each(function( elem ) {
+				parent = elem.parentNode;
 
 				while ( parent !== document ) {
-					if ( elements.indexOf( parent ) !== -1 ) {
-						includeUnique( parents, parent );
+					if ( elems.indexOf( parent ) !== -1 ) {
+						pushUnique( parents, parent );
 					}
 
 					parent = parent.parentNode;
@@ -250,20 +253,36 @@
 			return new Hata( parents );
 		},
 
+		// Return element which satisfies the 'selector'
 		filter: function( selector ) {
-			var elements = new Hata( selector ),
+			var elems = new Hata( selector ),
 				result = [];
 
-			this.each(function( element ) {
-				if ( elements.get().indexOf( element ) !== -1 ) {
-					includeUnique( result, element );
+			this.each(function( elem ) {
+				if ( elems.get().indexOf( elem ) !== -1 ) {
+					pushUnique( result, elem );
 				}
 			});
 
 			return new Hata( result );
+		},
+
+		// Is element satisfies the 'selector'?
+		is: function( selector ) {
+			return this.filter( selector ).length > 0;
+		},
+
+		// Invoke a 'iterator' on every item in a collection
+		each: function( iterator ) {
+			Hata.each( this.get(), iterator );
+
+			return this;
 		}
 	});
 
+	document.addEventListener( "DOMContentLoaded", domReadyCallback, false );
+	window.addEventListener( "load", domReadyCallback, false );
+
 	window.hata = Hata;
 
-}( window, window.document ));
+}( window ));
