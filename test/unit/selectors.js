@@ -1,84 +1,121 @@
 new function () {
 
-	var ID = "qunit-fixture",
-		$ID = "#" + ID,
-		win = window,
-		doc = win.document,
-		wrapper = doc.getElementById(ID),
-		slice = [].slice,
+	module( "Selectors" );
 
-		makeArray = function(obj) {
-			return Array.prototype.slice.call(obj);
-		};
-
-	module("Selectors");
-
-	test("Standart", function() {
-		expect(19);
-
-		deepEqual(hata().get(), [],
+	test( "Standart", function() {
+		deepEqual(
+			ha(), ja(),
 			"hata() return empty hata object");
 
-		deepEqual(hata(window).get(), [win],
-			"hata(window) is window");
+		deepEqual(
+			ha( "" ), ja( "" ),
+			"hata( '' ) return empty hata object");
 
-		deepEqual(hata(doc).get(), [doc],
-			"hata(document) is document");
+		deepEqual(
+			ha( false ), ja( false ),
+			"hata( false ) return empty hata object");
 
-		deepEqual(hata("body").get(), [doc.body],
-			"hata(\"body\") is body");
+		// Not like jQuery
+		deepEqual(
+			ha( true ), [],
+			"hata( true ) return empty hata object");
 
-		deepEqual(hata(hata("body")).get(), [doc.body],
-			"hata( hata(\"body\") ) is body");
+		deepEqual(
+			ha( null ), ja( null ),
+			"hata( null ) return empty hata object");
 
-		deepEqual(hata(doc.getElementsByTagName("p")).get(), makeArray(doc.getElementsByTagName("p")),
-			"hata( document.getElementsByTagName(\"p\") ) is right");
+		deepEqual(
+			ha( undefined ), ja( undefined ),
+			"hata( undefined ) return empty hata object");
 
-		deepEqual(hata(doc.querySelector("p")).get(), [doc.querySelector("p")],
-			"hata( document.querySelector(\"p\") ) is right");
-		deepEqual(hata(doc.querySelectorAll("p")).get(), makeArray(doc.querySelectorAll("p")),
-			"hata( document.querySelectorAll(\"p\") ) is right");
+		deepEqual(
+			ha( window ), ja( window ),
+			"hata( window )");
 
-		deepEqual(hata("p").get(), makeArray(doc.getElementsByTagName("p")),
-			"hata(\"p\") is right");
-		strictEqual(hata("p").get(0), doc.getElementsByTagName("p")[0],
-			"hata(\"p\").get(0) is right");
-		strictEqual(hata("p").get().length, doc.getElementsByTagName("p").length,
-			"hata(\"p\") right length");
-		strictEqual(hata($ID + " p").get().length, wrapper.getElementsByTagName("p").length,
-			"hata(\"#id p\") right length");
+		deepEqual(
+			ha( document ), ja( document ),
+			"hata( document )");
 
-		deepEqual(hata($ID).get(), [wrapper],
-			"hata(\"#id\") is right");
-		strictEqual(hata($ID).get().length, 1,
-			"hata(\"#id\") right length");
+		deepEqual(
+			ha( "body" ), ja( "body" ),
+			"hata( 'body' )");
 
-		deepEqual(hata(".foo").get(), makeArray(doc.getElementsByClassName("foo")),
-			"hata(\".foo\") is right");
-		strictEqual(hata(".foo").get().length, doc.getElementsByClassName("foo").length,
-			"hata(\".foo\") right length");
+		deepEqual(
+			ha( "#" + ID ), ja( "#" + ID ),
+			"hata( '#ID' )");
 
-		deepEqual(hata(".foo").get(), makeArray(doc.getElementsByClassName("foo")),
-			"hata(\".foo\") is right");
+		deepEqual(
+			ha( "#" + ID + ", #" + ID + "-h1" ), ja( "#" + ID + ", #" + ID + "-h1" ),
+			"hata( '#ID, #ID2' )");
 
-		strictEqual(hata("unknownTag").get().length, 0,
-			"hata(\"unknownTag\") returns nothing");
+		deepEqual(
+			ha( ".foo" ), ja( ".foo" ),
+			"hata( '.class' )");
 
-		deepEqual(hata("#element_is_null").get(), [],
-			"if no element should be empty");
+		deepEqual(
+			ha( ".foo, .bar" ), ja( ".foo, .bar" ),
+			"hata( '.class, .class' )");
+
+		deepEqual(
+			ha( ".foo.foo-class" ), ja( ".foo.foo-class" ),
+			"hata( '.class.class' )");
+
+		deepEqual(
+			ha( "*" ), ja( "*" ),
+			"hata( '*' )");
+
+		deepEqual(
+			ha( "[title*=\"es\"]" ), ja( "[title*=\"es\"]" ),
+			"hata( '[attr*=\"value\"]' )");
+
+		deepEqual(
+			ha( "a" ), ja( "a" ),
+			"hata( 'tag' )");
+
+		deepEqual(
+			ha( "asd" ), ja( "asd" ),
+			"hata( 'unknown' ) return empty hata object");
+
+		deepEqual(
+			ha( document.querySelectorAll( "p" ) ), ja( document.querySelectorAll( "p" ) ),
+			"hata( document.querySelectorAll( 'tag' ) )");
+
+		deepEqual(
+			ha( document.getElementsByTagName( "p" ) ), ja( document.getElementsByTagName( "p" ) ),
+			"hata( document.getElementsByTagName( 'p' ) )");
+
+		deepEqual(
+			ha( document.getElementById( ID ) ), ja( document.getElementById( ID ) ),
+			"hata( document.getElementById( 'ID' ) )");
+
+		deepEqual(
+			ha( hata( "a" ) ), ja( "a" ),
+			"hata( hata( 'tag' ) )");
 	});
 
-	test("With context", function() {
-		expect(3);
+	test( "With context", function() {
+		deepEqual(
+			ha( "#" + ID + "-h1", "#" + ID ), ja( "#" + ID + "-h1", "#" + ID ),
+			"hata( '#ID2', '#ID1' ) [Node #ID2 inside #ID1]");
 
-		deepEqual(hata("p", $ID).get(), makeArray(wrapper.getElementsByTagName("p")),
-			"hata(\"p\", \"#id\") is right");
+		console.log(ha( "#" + ID));
+		console.log(ha("#" + ID + "-h1" ));
 
-		deepEqual(hata("p", hata($ID)).get(), makeArray(wrapper.getElementsByTagName("p")),
-			"hata(\"p\", hata(\"#id\")) is right");
+		deepEqual(
+			ha( "#" + ID, "#" + ID + "-h1" ), ja( "#" + ID, "#" + ID + "-h1" ),
+			"hata( '#ID1', '#ID2' ) [Node #ID2 inside #ID1] return empty hata object");
 
-		deepEqual(hata("p", $ID).get(), makeArray(wrapper.getElementsByTagName("p")),
-			"hata(\"p\", document.getElementById(\"id\")) is right");
+		deepEqual(
+			ha( "#" + ID + "-h1", hata( "#" + ID ) ), ja( "#" + ID + "-h1", "#" + ID ),
+			"hata( '#ID2', hata( '#ID1' ) ) [Node #ID2 inside #ID1]");
+
+		deepEqual(
+			ha( "#" + ID, hata( "#" + ID + "-h1" ) ), ja( "#" + ID, "#" + ID + "-h1" ),
+			"hata( '#ID1', hata( '#ID2' ) ) [Node #ID2 inside #ID1] return empty hata object");
+
+		deepEqual(
+			ha( "a", "p" ), ja( "a", "p" ),
+			"hata( 'tag', 'tag' )");
 	});
 
 };

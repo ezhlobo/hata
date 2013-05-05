@@ -1,138 +1,184 @@
 new function () {
 
-	var ID = "qunit-fixture",
-		$ID = "#" + ID,
-		win = window,
-		doc = win.document,
-		wrapper = doc.getElementById(ID),
-		slice = [].slice,
-
-		makeArray = function(obj) {
-			return Array.prototype.slice.call(obj);
-		};
-
 	module("Traversing");
 
-	test(".eq()", function() {
-		expect(3);
+	test( ".eq()", function() {
+		deepEqual(
+			hata( "#" + ID ).eq( 0 ).get(), jQuery( "#" + ID ).eq( 0 ).toArray(),
+			"hataObj.eq( 0 ) return hata object of hataObj first node");
 
-		deepEqual(hata($ID).eq(0).get(), hata(wrapper).get(),
-			"hata(\"#id\").eq(0) return hata object of first DOMNode");
+		deepEqual(
+			hata( "#" + ID ).eq( -1 ).get(), jQuery( "#" + ID ).eq( -1 ).toArray(),
+			"hataObj.eq( -1 ) return hata object of hataObj last node");
 
-		var node = wrapper.querySelectorAll("p");
+		// Not like jQuery
+		deepEqual(
+			hata( "#" + ID ).eq().get(), ja( "#" + ID ),
+			"hataObj.eq() return hataObj");
 
-		deepEqual(hata("p").eq(-1).get(), hata(node[--node.length]).get(),
-			"hata(\"p\").eq(-1) return hata object of last DOMNode");
+		deepEqual(
+			hata( "#" + ID ).eq( 1000 ).get(), jQuery( "#" + ID ).eq( 1000 ).toArray(),
+			"hataObj.eq( 1000 ) return hata object by not exist index");
 
-		deepEqual(hata("p").eq(100).get(), hata("").get(),
-			"hata(\"p\").eq(non-existent) return empty hata object");
+		deepEqual(
+			hata().eq().length, jQuery().eq().length,
+			"hata().eq() return empty array");
+
+		deepEqual(
+			hata( "#" + ID ).eq( "0" ).get(), jQuery( "#" + ID ).eq( 0 ).toArray(),
+			"hataObj.eq( '0' )");
 	});
 
-	test(".is()", function() {
-		expect(5);
-
-		ok(typeof hata().is() === "boolean",
+	test( ".is()", function() {
+		ok(
+			typeof hata().is() === "boolean",
 			"return right type")
 
-		ok(hata($ID).is("div") === true,
-			"hata(\"#id\").is(\"div\") return true");
+		ok(
+			hata( "#" + ID ).is("div") === true,
+			"hata( '#ID' ).is( 'tag' ) return true");
 
-		ok(hata($ID).is(wrapper) === true,
-			"hata(\"#id\").is(wrapper) return true");
+		ok(
+			hata( "#" + ID ).is( document.getElementById( ID ) ) === true,
+			"hata( '#ID' ).is( document.getElementById( 'ID' ) ) return true");
 
-		ok(hata($ID).is(doc.querySelectorAll("div")) === true,
-			"hata(\"#id\").is(document.querySelectorAll(\"div\")) return true");
+		ok(
+			hata( "#" + ID ).is( document.querySelectorAll( "div" ) ) === true,
+			"hata( '#ID' ).is( document.querySelectorAll( 'div' ) ) return true");
 
-		ok(hata("div").is(wrapper) === true,
-			"hata(\"div\").is(wrapper) return true");
+		ok(
+			hata( "div" ).is( document.getElementById( ID ) ) === true,
+			"hata( 'tag' ).is( document.getElementById( 'ID' ) ) return true");
 	});
 
-	test(".each()", function() {
-		expect(4);
+	test( ".each()", function() {
+		ok(
+			hata().each() instanceof hata,
+			"hata().each() return hata object");
 
-		ok(hata().each(function(){}) instanceof hata,
-			"return hata object");
-
-		var nodes = doc.querySelectorAll("p"),
+		var nodes = document.querySelectorAll( "p" ),
 			outElems = [],
 			outIndex = 0;
 
-		hata(nodes).each(function(elem, index) {
-			outElems[outElems.length] = elem;
+		hata( nodes ).each(function( elem, index ) {
+			outElems.push( elem );
 			outIndex = index;
 		});
 
-		deepEqual(outElems, makeArray(nodes),
+		deepEqual(
+			outElems, [].slice.call( nodes ),
 			"iterators has right first argument");
 
-		ok(outIndex == --nodes.length,
+		ok(
+			outIndex == --nodes.length,
 			"iterators has right second arguments");
 
-		hata(nodes).each(function(elem, index) {
+		hata( nodes ).each(function( elem, index ) {
 			if ( index == nodes.length - 2 ) {
 				return false;
 			}
 			outIndex = index;
 		});
 
-		ok(outIndex == nodes.length - 3,
+		ok(
+			outIndex == nodes.length - 3,
 			"correct break iterations");
 	});
 
-	test(".find()", function() {
-		expect(3);
+	test( ".find()", function() {
+		var nodes = document.querySelectorAll( "p" );
 
-		var nodes = doc.querySelectorAll("p");
+		deepEqual(
+			hata( document ).find( "p" ).get(), ja( nodes ),
+			"hata( document ).find( 'p' )");
 
-		deepEqual(hata(doc).find("p").get(), makeArray(nodes),
-			"hata(document).find(\"p\") is right");
+		deepEqual(
+			hata( document ).find( "asd" ).get(), [],
+			"hata( document ).find( 'unknown' ) return empty hata object");
 
-		deepEqual(hata(doc).find("unknownTag").get(), [],
-			"hata(document).find(unknownTag) return empty hata object");
+		deepEqual(
+			hata( "#" + ID ).find( "body" ).get(), [],
+			"hata( '#ID' ).find( 'body' ) return empty hata object");
 
-		deepEqual(hata($ID).find("body").get(), [],
-			"hata(\"#id\").find(\"body\") return empty hata object");
+		deepEqual(
+			hata( "#" + ID + "-h1" ).find( "#" + ID ).get(), [],
+			"hata( '#ID2' ).find( '#ID1' ) [Node #ID2 inside #ID1] return empty hata object");
 	});
 
-	test(".closest()", function() {
-		expect(3);
+	test( ".closest()", function() {
+		deepEqual(
+			hata( "p" ).closest( "body" ).get(), ja( "body" ),
+			"hata( 'p' ).closest( 'body' )");
 
-		deepEqual(hata("p").closest("body").get(), [doc.body],
-			"hata(\"p\").closest(\"body\") is right");
+		deepEqual(
+			hata( "body" ).closest( "body" ).get(), ja( "body" ),
+			"hata( 'body' ).closest( 'body' )");
 
-		deepEqual(hata("body").closest("body").get(), [doc.body],
-			"hata(\"body\").closest(\"body\") return hata object of body node");
+		deepEqual(
+			hata( "p" ).closest( "div" ).get(), jQuery( "p" ).closest( "div" ).toArray(),
+			"hata( 'p' ).closest( 'div' )");
 
-		deepEqual(hata("body").closest("p").get(), [],
-			"hata(\"body\").closest(\"p\") return empty hata object");
+		deepEqual(
+			hata( "body" ).closest( "p" ).get(), [],
+			"hata( 'body' ).closest( 'p' ) return empty hata object");
+
+		deepEqual(
+			hata( "p" ).closest( document ).get(), [],
+			"hata( 'p' ).closest( document ) return empty hata object");
 	});
 
-	test(".parents()", function() {
-		expect(3);
+	test( ".parent()", function() {
+		equal(
+			hata( "#" + ID + "-h1" ).parent().get( 0 ).id, ID,
+			"Simple parent check");
 
-		deepEqual(hata($ID).parents("body").get(), [doc.body],
-			"hata(\"#id\").parents(\"body\") return hata object of body node");
+		ok(
+			isSimilarArrays( hata( "#" + ID + " a" ).parent().get(), jQuery( "#" + ID + " a" ).parent().toArray() ),
+			"Check for results from parent");
 
-		deepEqual(hata("body").parents("body").get(), [],
-			"hata(\"body\").parents(\"body\") return empty hata object");
-
-		deepEqual(hata("body").parents("p").get(), [],
-			"hata(\"body\").parents(\"p\") return empty hata object");
+		deepEqual(
+			hata( "#" + ID + " p" ).parent().get(), ja( "#" + ID ),
+			"Check for unique results from parent");
 	});
 
-	test(".filter()", function() {
-		expect(3);
+	test( ".parents()", function() {
+		deepEqual(
+			hata( "#" + ID ).parents( "body" ).get(), ja( "body" ),
+			"hata( '#ID' ).parents( 'body' )");
 
-		deepEqual(hata("a").filter(".foo").get(), makeArray(doc.querySelectorAll(".foo")),
-			"hata(\"a\").filter(\".foo\") is right");
+		ok(
+			isSimilarArrays( hata( "a" ).parents( "p" ).get(), jQuery( "a" ).parents( "p" ).toArray() ),
+			"hata( 'a' ).parents( 'p' )");
 
-		deepEqual(hata("a").filter("p").get(), [],
-			"hata(\"a\").filter(\"p\") return empty hata object");
+		deepEqual(
+			hata( "body" ).parents( "body" ).get(), [],
+			"hata( 'body' ).parents( 'body' ) return empty hata object");
 
-		var node = doc.querySelectorAll("a[title]");
+		deepEqual(
+			hata( "p" ).parents( "div" ).get(), jQuery( "p" ).parents( "div" ).toArray(),
+			"hata( 'p' ).parents( 'div' )");
 
-		deepEqual(hata("a").filter("[title]").get(), makeArray(node),
-			"hata(\"a\").filter(\"[title]\") is right");
+		deepEqual(
+			hata( "body" ).parents( "p" ).get(), [],
+			"hata( 'body' ).parents( 'p' ) return empty hata object");
+
+		deepEqual(
+			hata( "p" ).parents( document ).get(), [],
+			"hata( 'p' ).parents( document ) return empty hata object");
+	});
+
+	test( ".filter()", function() {
+		deepEqual(
+			hata( "a" ).filter( ".foo" ).get(), ja( ".foo" ),
+			"hata( 'a' ).filter( '.foo' )");
+
+		deepEqual(
+			hata( "a" ).filter( "p" ).get(), [],
+			"hata( 'a' ).filter( 'p' ) return empty hata object");
+
+		deepEqual(
+			hata( "a" ).filter( "[title]" ).get(), ja( "a[title]" ),
+			"hata( 'a' ).filter( '[title]' )");
 	});
 
 };
