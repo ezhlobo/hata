@@ -98,9 +98,6 @@ new function () {
 			ha( "#" + ID + "-h1", "#" + ID ), ja( "#" + ID + "-h1", "#" + ID ),
 			"hata( '#ID2', '#ID1' ) [Node #ID2 inside #ID1]");
 
-		console.log(ha( "#" + ID));
-		console.log(ha("#" + ID + "-h1" ));
-
 		deepEqual(
 			ha( "#" + ID, "#" + ID + "-h1" ), ja( "#" + ID, "#" + ID + "-h1" ),
 			"hata( '#ID1', '#ID2' ) [Node #ID2 inside #ID1] return empty hata object");

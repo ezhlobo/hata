@@ -105,8 +105,6 @@ someObject.ping(); // => 'pong'
 
 ## Applications use hata
 
-* [evgen.zhlobo.info](http://evgen.zhlobo.info/) - my personal blog with responsive layout. Look at [sources](https://github.com/EvgenyZhlobo/ezhlobo/blob/master/source/javascripts/main.js) for better understand role of Hata.
-
 * [vkleaner](http://vkleaner.losky.net) - chrome extension for vk.com that hides unwanted posts. Look at [sources](https://github.com/EvgenyZhlobo/vkleaner/tree/master/js) for better understand role of Hata.
 
 ## Contributions

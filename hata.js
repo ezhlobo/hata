@@ -5,7 +5,10 @@
 		document = window.document,
 
 		// Is a given value an array?
-		isArray = Array.isArray,
+		// https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/isArray
+		isArray = Array.isArray || function( o ) {
+			return o && Object.prototype.toString.call( o ) === "[object Array]";
+		},
 
 		// Add an element to the array if it is unique
 		pushUnique = function( array, element ) {
@@ -81,11 +84,11 @@
 		};
 
 	var Hata = function( selector, context ) {
-		if ( !( this instanceof Hata )  ) {
+		if ( !( this instanceof Hata ) ) {
 			return new Hata( selector, context );
 		}
 
-		// HANDLE: hata(hata(selector))
+		// HANDLE: hata(Hata)
 		if ( selector instanceof Hata ) {
 			return selector;
 		}
@@ -139,7 +142,6 @@
 		}
 	};
 
-	// Extend a given object with all the properties in passed-in object(s)
 	Hata.extend = function( obj ) {
 		Hata.each( [].slice.call( arguments, 1 ), function( source ) {
 			Hata.each( source, function( value, prop ) {
@@ -149,6 +151,65 @@
 
 		return obj;
 	};
+
+
+	Hata.extend( Hata.prototype, {
+		// Return the Nth node in the hata object OR clean array
+		get: function( index ) {
+			var elems = this.elems;
+
+			return index == null ? elems :
+				index < 0 ? elems[ this.length + index ] : elems[ index ];
+		},
+
+		// Return the Nth element
+		eq: function( index ) {
+			return new Hata( this.get( index ) );
+		},
+
+		// Invoke a 'iterator' on every item in a collection
+		each: function( iterator ) {
+			Hata.each( this.get(), iterator );
+
+			return this;
+		},
+
+		// Return element which satisfies the 'selector'
+		filter: function( selector ) {
+			var elems = new Hata( selector ),
+				result = [];
+
+			this.each(function( elem ) {
+				if ( elems.get().indexOf( elem ) !== -1 ) {
+					pushUnique( result, elem );
+				}
+			});
+
+			return new Hata( result );
+		},
+
+		// Is element satisfies the 'selector'?
+		is: function( selector ) {
+			return this.filter( selector ).length > 0;
+		},
+
+		// Return the element found in the context in accordance with the 'selector'
+		find: function( selector ) {
+			var result = [];
+
+			this.each(function( elem ) {
+				var i = 0,
+					found = getElements_find( elem, selector ),
+					l = found.length;
+
+				while ( i < l ) {
+					pushUnique( result, found[ i++ ]);
+				}
+			});
+
+			return new Hata( result );
+		}
+	});
 
 	Hata.extend( Hata, {
 		ready: function( fn ) {
@@ -169,37 +230,11 @@
 		fn: Hata.prototype
 	});
 
+	document.addEventListener( "DOMContentLoaded", domReadyCallback, false );
+	window.addEventListener( "load", domReadyCallback, false );
+
+	// Additional
 	Hata.extend( Hata.fn, {
-		// Return the Nth node in the hata object OR clean array
-		get: function( num ) {
-			var elems = this.elems;
-
-			return num == null ? elems :
-				num < 0 ? elems[ this.length + num ] : elems[ num ];
-		},
-
-		// Return the Nth element
-		eq: function( num ) {
-			return new Hata( this.get( num ) );
-		},
-
-		// Return the element found in the context in accordance with the 'selector'
-		find: function( selector ) {
-			var result = [];
-
-			this.each(function( elem ) {
-				var i = 0,
-					found = getElements_find( elem, selector ),
-					l = found.length;
-
-				while ( i < l ) {
-					pushUnique( result, found[ i++ ]);
-				}
-			});
-
-			return new Hata( result );
-		},
-
 		// Return 'this' or closest parent which satisfies the 'selector'
 		closest: function( selector ) {
 			var parent,
@@ -251,38 +286,9 @@
 			});
 
 			return new Hata( parents );
-		},
-
-		// Return element which satisfies the 'selector'
-		filter: function( selector ) {
-			var elems = new Hata( selector ),
-				result = [];
-
-			this.each(function( elem ) {
-				if ( elems.get().indexOf( elem ) !== -1 ) {
-					pushUnique( result, elem );
-				}
-			});
-
-			return new Hata( result );
-		},
-
-		// Is element satisfies the 'selector'?
-		is: function( selector ) {
-			return this.filter( selector ).length > 0;
-		},
-
-		// Invoke a 'iterator' on every item in a collection
-		each: function( iterator ) {
-			Hata.each( this.get(), iterator );
-
-			return this;
 		}
 	});
 
-	document.addEventListener( "DOMContentLoaded", domReadyCallback, false );
-	window.addEventListener( "load", domReadyCallback, false );
-
 	window.hata = Hata;
 
-}( window ));
+})( window );
