@@ -208,33 +208,8 @@
 			});
 
 			return new Hata( result );
-		}
-	});
-
-	Hata.extend( Hata, {
-		ready: function( fn ) {
-			if ( isDomReady ) {
-				fn();
-			} else {
-				onDomReady.push( fn );
-			}
-
-			return this;
 		},
 
-		pushUniq: pushUnique,
-
-		toArray: toArray,
-
-		// Copy of class prototype
-		fn: Hata.prototype
-	});
-
-	document.addEventListener( "DOMContentLoaded", domReadyCallback, false );
-	window.addEventListener( "load", domReadyCallback, false );
-
-	// Additional
-	Hata.extend( Hata.fn, {
 		// Return 'this' or closest parent which satisfies the 'selector'
 		closest: function( selector ) {
 			var parent,
@@ -288,6 +263,28 @@
 			return new Hata( parents );
 		}
 	});
+
+	Hata.extend( Hata, {
+		ready: function( fn ) {
+			if ( isDomReady ) {
+				fn();
+			} else {
+				onDomReady.push( fn );
+			}
+
+			return this;
+		},
+
+		pushUniq: pushUnique,
+
+		toArray: toArray,
+
+		// Copy of class prototype
+		fn: Hata.prototype
+	});
+
+	document.addEventListener( "DOMContentLoaded", domReadyCallback, false );
+	window.addEventListener( "load", domReadyCallback, false );
 
 	window.hata = Hata;
 
