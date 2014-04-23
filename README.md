@@ -1,4 +1,4 @@
-# Hata
+# Hata (this document is deprecated)
 
 Lightweight JavaScript framework for manipulation dom elements.
 
