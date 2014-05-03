@@ -13,12 +13,12 @@
 
 	// Convert something into an array
 	Hata.nodesToArray = function( obj ) {
-		return obj ? [].slice.call( obj ) : [];
+		return [].slice.call( obj );
 	};
 
 	// Get array of elements by selector
 	Hata.getBySelector = function( selector ) {
-		return Hata.nodesToArray( document.querySelectorAll( selector ) );
+		return selector ? Hata.nodesToArray( document.querySelectorAll( selector ) ) : [];
 	};
 
 	// Link Hata.fn to prototype of Hata
