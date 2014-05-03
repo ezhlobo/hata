@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="utf-8" />
-		<title></title>
+		<title>Hata.js tests</title>
 		<link href="lib/qunit.css" rel="stylesheet" />
 		<script src="lib/jquery.js"></script>
 		<script src="lib/qunit.js"></script>
@@ -48,17 +48,10 @@
 				return jQuery.apply( this, arguments ).toArray();
 			},
 
-			ha = function() {
-				return hata.apply( this, arguments ).get();
-			},
-
 			isSimilarArrays = function( target, obj ) {
 				return target.sort().toString() == obj.sort().toString();
 			};
 		</script>
 		<script src="unit/selectors.js"></script>
-		<script src="unit/miscellaneous.js"></script>
-		<script src="unit/traversing.js"></script>
-		<script src="unit/utilities.js"></script>
 	</body>
 </html>
