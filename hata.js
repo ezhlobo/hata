@@ -6,7 +6,7 @@
 
 		// Hata wrapper
 		Hata = function( selector ) {
-			this.items = Hata.getBySelector( selector );
+			this.items = Hata.getBySelector( selector, document );
 
 			return this;
 		};
@@ -18,7 +18,12 @@
 
 	// Get array of elements by selector
 	Hata.getBySelector = function( selector ) {
-		return selector ? Hata.nodesToArray( document.querySelectorAll( selector ) ) : [];
+		return selector ? Hata.nodesToArray( Hata.getBySelector_string( selector ) ) : [];
+	};
+
+	// Get NodeList of nodes by string selector
+	Hata.getBySelector_string = function( selector ) {
+		return document.querySelectorAll( selector );
 	};
 
 	// Link Hata.fn to prototype of Hata
