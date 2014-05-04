@@ -5,52 +5,52 @@ new function () {
 	test( 'Friendly selectors', function() {
 
 		deepEqual(
-			new Hata('').items, [],
-			'new Hata( "" ) returns empty hata object');
+			hata('').items, [],
+			'hata( "" ) returns empty hata object');
 
 		deepEqual(
-			new Hata(false).items, [],
-			'new Hata( false ) returns empty hata object');
+			hata(false).items, [],
+			'hata( false ) returns empty hata object');
 
 		deepEqual(
-			new Hata(true).items, [],
-			'new Hata( true ) returns empty hata object');
+			hata(true).items, [],
+			'hata( true ) returns empty hata object');
 
 		deepEqual(
-			new Hata(null).items, [],
-			'new Hata( null ) returns empty hata object');
+			hata(null).items, [],
+			'hata( null ) returns empty hata object');
 
 		deepEqual(
-			new Hata(undefined).items, [],
-			'new Hata( undefined ) returns empty hata object');
+			hata(undefined).items, [],
+			'hata( undefined ) returns empty hata object');
 
 		deepEqual(
-			new Hata(window).items, [window],
-			'new Hata( window )');
+			hata(window).items, [window],
+			'hata( window )');
 
 		deepEqual(
-			new Hata(document).items, [document],
-			'new Hata( document )');
+			hata(document).items, [document],
+			'hata( document )');
 
 		deepEqual(
-			new Hata(document.querySelectorAll( "p" )).items, [document.querySelectorAll( "p" )],
-			'new Hata( document.querySelectorAll( "p" ) )');
+			hata(document.querySelectorAll( "p" )).items, [].slice.call(document.querySelectorAll( "p" )),
+			'hata( document.querySelectorAll( "p" ) )');
 
 		deepEqual(
-			new Hata(document.getElementsByTagName( "p" )).items, [document.getElementsByTagName( "p" )],
-			'new Hata( document.getElementsByTagName( "p" ) )');
+			hata(document.getElementsByTagName( "p" )).items, [].slice.call(document.getElementsByTagName( "p" )),
+			'hata( document.getElementsByTagName( "p" ) )');
 
 		deepEqual(
-			new Hata(document.getElementById( ID )).items, [document.getElementById( ID )],
-			'new Hata( document.getElementById( ID ) )');
+			hata(document.getElementById( ID )).items, [document.getElementById( ID )],
+			'hata( document.getElementById( ID ) )');
 
 		deepEqual(
-			new Hata(new Hata('a')).items, ja('a'),
-			'new Hata( new Hata( "a" ) )');
+			hata( hata('a') ).items, [].slice.call(document.querySelectorAll( "a" )),
+			'hata( hata( "a" ) )');
 
 		deepEqual(
-			hata().items, [],
-			'hata() alias for new Hata');
+			hata( new Hata('a') ).items, [].slice.call(document.querySelectorAll( "a" )),
+			'hata( new Hata( "a" ) )');
 
 	});
 
